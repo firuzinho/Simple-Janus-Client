@@ -1,5 +1,8 @@
 <?php
 
+/**
+ * Class JanusClient
+ */
 class JanusClient {
 
     const
@@ -11,18 +14,37 @@ class JanusClient {
 
     const PLUGIN_VIDEOROOM = 'janus.plugin.videoroom';
 
+    /**
+     * @var string
+     */
     protected $serverAddress = '';
 
+    /**
+     * @var string
+     */
     protected $apiSecret = '';
 
+    /**
+     * @var string
+     */
     protected $pluginHandleId = '';
 
+    /**
+     * @var string
+     */
     protected $sessionId = '';
 
+    /**
+     * @var string
+     */
     protected $transaction = '';
 
 
-
+    /**
+     * JanusClient constructor.
+     * @param $serverAddress
+     * @param string $apiSecret
+     */
     public function __construct($serverAddress, $apiSecret = '')
     {
         $this->serverAddress = $serverAddress;
@@ -31,10 +53,19 @@ class JanusClient {
         $this->transaction = $this->generateTransactionId();
     }
 
+    /**
+     * @return string
+     */
     public function generateTransactionId() {
         return md5(uniqid("jvtid_"));
     }
 
+    /**
+     * @param $method
+     * @param array $requestParams
+     * @param string $url
+     * @return mixed
+     */
     public function sendQuery($method, array $requestParams, $url = '') {
 
         if ($this->apiSecret !== '') {
@@ -90,6 +121,11 @@ class JanusClient {
 
     }
 
+    /**
+     * @param $message
+     * @param string $jsep
+     * @return mixed
+     */
     private function _sendMessage($message, $jsep = '')
     {
         $data = array(
@@ -106,6 +142,9 @@ class JanusClient {
         return $this->sendQuery(self::METHOD_POST, $data);
     }
 
+    /**
+     * @return string
+     */
     public function connect() {
 
         $params = array(
@@ -124,6 +163,9 @@ class JanusClient {
         return $this->sessionId;
     }
 
+    /**
+     * @return string|void
+     */
     public function disconnect() {
 
         if ($this->sessionId == '') {
@@ -144,6 +186,9 @@ class JanusClient {
         return $this->sessionId;
     }
 
+    /**
+     * @return string|null
+     */
     public function attach()
     {
         if (!$this->isLoggedIn()) {
@@ -169,6 +214,9 @@ class JanusClient {
         return $this->pluginHandleId;
     }
 
+    /**
+     * @return bool
+     */
     public function detach()
     {
         $params = array(
@@ -189,11 +237,23 @@ class JanusClient {
     }
 
 
+    /**
+     * @return bool
+     */
     public function isLoggedIn()
     {
         return $this->sessionId !== '';
     }
 
+    /**
+     * @param $desc
+     * @param $recordDir
+     * @param int $room
+     * @param int $bitrate
+     * @param int $countOfPublishers
+     * @param string $secret
+     * @return bool
+     */
     public function createRoom($desc, $recordDir, $room = 0, $bitrate = 0, $countOfPublishers = 6, $secret = '')
     {
 
@@ -220,6 +280,10 @@ class JanusClient {
         return $this->_createRoom($room, $params);
     }
 
+    /**
+     * @param $roomId
+     * @param $secret
+     */
     public function destroyRoom($roomId, $secret) {
         $data = array(
             'request' => 'destroy',
@@ -231,6 +295,11 @@ class JanusClient {
 
     }
 
+    /**
+     * @param $room
+     * @param array $params
+     * @return bool
+     */
     private function _createRoom($room, $params=array())
     {
         if (!$this->isLoggedIn()) {
